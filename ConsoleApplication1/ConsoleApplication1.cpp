@@ -33,10 +33,14 @@ int eval(string s)
 {
 	line = s.substr(s.find('=')).substr(0, s.find_last_of(';'));
 	line = trim(line);
-	int result = expression_value();
 	string var = s.substr(0, s.find('=') - 1);
 	var = trim(var);
-	
+	map<string, int>::iterator iter;
+	iter = result.find(var);
+	if(iter->second)
+	{
+		
+	}
 	return expression_value();
 }
 
@@ -196,11 +200,13 @@ int main(char argc, char *argv[])
 	 // 	data = trim(data);
 	 // 	lexical(data);
 	 // }
-	 //
-	map<string, int>map1;
-	map1["a"] = 1;
-	map1["a"] = 2;
-	map<string, int>::iterator iter;
-	iter = map1.find("a");
-	cout << iter->second;
+	 
+	// map<string, int> s;
+	// s["a"] = 1;
+	// map<string, int>::iterator iter;
+	// iter = s.find("b");
+	// if(s.count("b"))
+	// {
+	// 	cout << "hhh";
+	// }
 }
