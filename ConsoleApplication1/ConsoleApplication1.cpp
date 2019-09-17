@@ -10,8 +10,8 @@
 
 using namespace  std;
 
-map<string, int> result;
-map<string, float>result2;
+map<string, int> result; //存整数的
+map<string, float>result2; //存浮点数的
 
 int factor_value();
 int term_value();
@@ -31,7 +31,12 @@ string trim(string &s)
 string line;
 int eval(string s)
 {
-	line = s;
+	line = s.substr(s.find('=')).substr(0, s.find_last_of(';'));
+	line = trim(line);
+	int result = expression_value();
+	string var = s.substr(0, s.find('=') - 1);
+	var = trim(var);
+	
 	return expression_value();
 }
 
@@ -162,6 +167,12 @@ void lexical(string s)
 		
 	}
 
+	else if(s.find('=')!=-1)
+	{
+		eval(s);
+	}
+
+
 }
 
 int main(char argc, char *argv[])
@@ -178,15 +189,13 @@ int main(char argc, char *argv[])
 	}
 	// getline(infile, data);
 
-	//开始读写文件
-	/*while(!infile.eof())
-	{
-		getline(infile, data);
-		data = trim(data);
-		lexical(data);
-	}*/
-	string str1 = "2+3*4";
-	cout << eval(str1);
-
+	// 开始读写文件
+	 // while(!infile.eof())
+	 // {
+	 // 	getline(infile, data);
+	 // 	data = trim(data);
+	 // 	lexical(data);
+	 // }
+	 //
 
 }
