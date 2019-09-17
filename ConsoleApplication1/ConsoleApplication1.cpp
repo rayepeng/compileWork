@@ -13,6 +13,9 @@ using namespace  std;
 map<string, int> result;
 map<string, float>result2;
 
+int factor_value();
+int term_value();
+int expression_value();
 //实现trim函数
 string trim(string &s)
 {
@@ -25,13 +28,91 @@ string trim(string &s)
 	return s;
 }
 
-
+string line;
 int eval(string s)
 {
-
-	return 1;
+	line = s;
+	return expression_value();
 }
 
+int expression_value()
+{
+	//表达式是由tem+-term得到的
+	//计算出第一项的值
+	int result = term_value();
+	bool more = true;
+	while (more)
+	{
+		char op = line[0];
+		if (op == '+' || op == '-')
+		{
+			line = line.erase(0,1);
+			if (op == '+')
+			{
+				result += term_value();
+			}
+			else
+			{
+				result -= term_value();
+			}
+		}
+		else
+		{
+			more = false;
+		}
+
+	}
+	return result;
+}
+
+int term_value()
+{
+	//计算项的值
+	//term = factor*factor || factor / factor
+	int result = factor_value();
+	bool more = true;
+	while (more)
+	{
+		char op = line[0];
+		if (op == '*' || op == '|')
+		{
+			line = line.erase(0, 1);
+			if (op == '*')
+				result *= factor_value();
+			else
+			{
+				result /= factor_value();
+			}
+
+		}
+		else
+		{
+			more = false;
+		}
+	}
+	return result;
+}
+int factor_value()
+{
+	// (expression_value) || 整数
+	int result = 0;
+	char op = line[0];
+	if (op == '(')
+	{
+		result = expression_value();
+		line = line.erase(0, 1);
+	}
+	else
+	{
+		while (isdigit(op))
+		{
+			result = 10 * result + op - '0';
+			line = line.erase(0,1);
+			op = line[0];
+		}
+	}
+	return result;
+}
 void extract_val(string s, int flag)
 {
 	//int i = 1; flag代表是哪种类型的
@@ -98,11 +179,14 @@ int main(char argc, char *argv[])
 	// getline(infile, data);
 
 	//开始读写文件
-	while(!infile.eof())
+	/*while(!infile.eof())
 	{
 		getline(infile, data);
 		data = trim(data);
 		lexical(data);
-	}
+	}*/
+	string str1 = "2+3*4";
+	cout << eval(str1);
+
 
 }
