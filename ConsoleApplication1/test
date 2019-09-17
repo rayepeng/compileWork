@@ -1,0 +1,6 @@
+int i ;
+i = 1+2*3;
+int bbbb;
+bbbb = 3*4+9999;
+write(i);
+write(bbbb);
