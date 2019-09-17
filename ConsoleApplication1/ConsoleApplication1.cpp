@@ -10,10 +10,11 @@
 
 using namespace  std;
 
-map<string, string> result;
+map<string, int> result;
+map<string, float>result2;
 
 //实现trim函数
-string& trim(string &s)
+string trim(string &s)
 {
 	if(s.empty())
 	{
@@ -24,18 +25,64 @@ string& trim(string &s)
 	return s;
 }
 
-void lexical(string s)
+
+int eval(string s)
 {
-	if(s.find('int') == 0)
+
+	return 1;
+}
+
+void extract_val(string s, int flag)
+{
+	//int i = 1; flag代表是哪种类型的
+	if(flag == 1)
 	{
-		cout << s;
+		int fenhao = s.find_first_of(';');
+		string var = s.substr(3, fenhao-3);
+		var = trim(var);
+		//要查重
+		result.insert(pair<string, int>(var, 0));
 	}
-	// else if(s.find('float') == 0)
-	// {
-	// 	
-	// }
+	if(flag == 2)
+	{
+		int fenhao = s.find_last_of(';');
+		string var = s.substr(5, fenhao - 3);
+		var = trim(var);
+		result2.insert(pair<string, float>(var, 0.0));
+	}
 
 }
+void lexical(string s)
+{
+	if(s.substr(0,3) == "int")
+	{
+		if(s.find('=') != -1)
+		{
+			//说明在赋值
+			cout << "暂时不支持";
+		}
+		else
+		{
+			extract_val(s, 1);
+		}
+	}
+	else if(s.substr(0, 5) == "float"){
+		if(s.find('=') != -1)
+		{
+			cout << "暂时不支持";
+		}
+		else
+		{
+			extract_val(s, 2);
+		}
+	}
+	else if(s.substr(0, 6) == "double")
+	{
+		
+	}
+
+}
+
 int main(char argc, char *argv[])
 {
 	// FILE* f = fopen("test", "r");
@@ -55,7 +102,7 @@ int main(char argc, char *argv[])
 	{
 		getline(infile, data);
 		data = trim(data);
-		cout << data.find_first_of('float');
+		lexical(data);
 	}
 
 }
