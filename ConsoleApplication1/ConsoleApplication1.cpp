@@ -197,5 +197,10 @@ int main(char argc, char *argv[])
 	 // 	lexical(data);
 	 // }
 	 //
-
+	map<string, int>map1;
+	map1["a"] = 1;
+	map1["a"] = 2;
+	map<string, int>::iterator iter;
+	iter = map1.find("a");
+	cout << iter->second;
 }
