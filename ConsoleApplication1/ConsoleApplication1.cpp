@@ -6,8 +6,36 @@
 #include <string.h>
 #include <string>
 #include <fstream>
+#include <map>
 
 using namespace  std;
+
+map<string, string> result;
+
+//实现trim函数
+string& trim(string &s)
+{
+	if(s.empty())
+	{
+		return s;
+	}
+	s.erase(0, s.find_first_not_of(" "));
+	s.erase(s.find_last_not_of(" ") + 1);
+	return s;
+}
+
+void lexical(string s)
+{
+	if(s.find('int') == 0)
+	{
+		cout << s;
+	}
+	// else if(s.find('float') == 0)
+	// {
+	// 	
+	// }
+
+}
 int main(char argc, char *argv[])
 {
 	// FILE* f = fopen("test", "r");
@@ -20,6 +48,14 @@ int main(char argc, char *argv[])
 	{
 		cout << "打开文件错误！！" << endl;
 	}
-	infile >> data;
+	// getline(infile, data);
+
+	//开始读写文件
+	while(!infile.eof())
+	{
+		getline(infile, data);
+		data = trim(data);
+		cout << data.find_first_of('float');
+	}
 
 }
