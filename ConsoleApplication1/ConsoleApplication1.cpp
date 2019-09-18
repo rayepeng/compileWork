@@ -29,19 +29,22 @@ string trim(string &s)
 }
 
 string line;
-int eval(string s)
+void eval(string s)
 {
-	line = s.substr(s.find('=')).substr(0, s.find_last_of(';'));
+	line = s.substr(s.find('=')+1).substr(0, s.find_last_of(';'));
 	line = trim(line);
 	string var = s.substr(0, s.find('=') - 1);
 	var = trim(var);
 	map<string, int>::iterator iter;
-	iter = result.find(var);
-	if(iter->second)
+	int flag = 0;
+	if(result.count(var))
 	{
-		
+		flag = 1;
+		result[var] = expression_value();
+	}else if(result2.count(var))
+	{
+		flag = 2;
 	}
-	return expression_value();
 }
 
 int expression_value()
@@ -175,7 +178,15 @@ void lexical(string s)
 	{
 		eval(s);
 	}
-
+	else if(s.substr(0, 5) == "write")
+	{
+		//提取变量
+		string var = s.substr(s.find("(") + 1, s.find_last_of(')') - s.find('(')-1);
+		if(result.count(var))
+		{
+			cout << result[var];
+		}
+	}
 
 }
 
@@ -194,12 +205,12 @@ int main(char argc, char *argv[])
 	// getline(infile, data);
 
 	// 开始读写文件
-	 // while(!infile.eof())
-	 // {
-	 // 	getline(infile, data);
-	 // 	data = trim(data);
-	 // 	lexical(data);
-	 // }
+	 while(!infile.eof())
+	 {
+	 	getline(infile, data);
+	 	data = trim(data);
+	 	lexical(data);
+	 }
 	 
 	// map<string, int> s;
 	// s["a"] = 1;
