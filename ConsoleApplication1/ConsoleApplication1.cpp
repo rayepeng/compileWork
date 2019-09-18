@@ -134,14 +134,30 @@ void extract_val(string s, int flag)
 		string var = s.substr(3, fenhao-3);
 		var = trim(var);
 		//要查重
-		result.insert(pair<string, int>(var, 0));
+		if(result.count(var))
+		{
+			cout << "变量重复"<<var<<"定义！" << endl;
+		}
+		else
+		{
+			result.insert(pair<string, int>(var, 0));
+		}
+		
 	}
 	if(flag == 2)
 	{
 		int fenhao = s.find_last_of(';');
 		string var = s.substr(5, fenhao - 3);
 		var = trim(var);
-		result2.insert(pair<string, float>(var, 0.0));
+		if(result.count(var))
+		{
+			cout << "变量重复" << var << "定义！" << endl;
+		}
+		else
+		{
+			result2.insert(pair<string, float>(var, 0.0));
+		}
+		
 	}
 
 }
