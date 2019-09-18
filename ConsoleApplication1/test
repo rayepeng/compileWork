@@ -1,4 +1,4 @@
-int i ;
-int i;
+float i;
+i = 3*4*2.15;
 write(i);
 
