@@ -7,7 +7,7 @@
 #include <string>
 #include <fstream>
 #include <map>
-
+#include <math.h>
 using namespace  std;
 
 map<string, int> result; //存整数的
@@ -41,9 +41,11 @@ void eval(string s)
 	{
 		flag = 1;
 		result[var] = expression_value();
-	}else if(result2.count(var))
+	}
+	if(result2.count(var))
 	{
 		flag = 2;
+		result2[var] = expression_value();
 	}
 }
 
@@ -51,7 +53,7 @@ int expression_value()
 {
 	//表达式是由tem+-term得到的
 	//计算出第一项的值
-	int result = term_value();
+	float result = term_value();
 	bool more = true;
 	while (more)
 	{
@@ -81,7 +83,7 @@ int term_value()
 {
 	//计算项的值
 	//term = factor*factor || factor / factor
-	int result = factor_value();
+	float result = factor_value();
 	bool more = true;
 	while (more)
 	{
@@ -104,10 +106,12 @@ int term_value()
 	}
 	return result;
 }
+
+
 int factor_value()
 {
 	// (expression_value) || 整数
-	int result = 0;
+	float result = 0;
 	char op = line[0];
 	if (op == '(')
 	{
@@ -116,11 +120,38 @@ int factor_value()
 	}
 	else
 	{
-		while (isdigit(op))
+		int countFloat = 0;
+		bool isFloat = false;
+		while (isdigit(op) || op == '.')
 		{
-			result = 10 * result + op - '0';
-			line = line.erase(0,1);
-			op = line[0];
+			
+			if(op == '.' )
+			{
+				isFloat = true;
+				line = line.erase(0, 1);
+				op = line[0];
+				continue;
+
+			}
+			if(isFloat)
+			{
+				//说明是浮点数，先按照整数提取的来
+				result = 10 * result + op - '0';
+				line = line.erase(0, 1);
+				op = line[0];
+				countFloat++; //统计浮点数后面有多少位
+			}
+			else
+			{
+				result = 10 * result + op - '0';
+				line = line.erase(0, 1);
+				op = line[0];
+			}
+		}
+		if(countFloat)
+		{
+			cout << result;
+			result = result / pow(10, countFloat);
 		}
 	}
 	return result;
@@ -130,8 +161,9 @@ void extract_val(string s, int flag)
 	//int i = 1; flag代表是哪种类型的
 	if(flag == 1)
 	{
+		//先找到分号的位置，然后提取出来注意substr函数有点不一样
 		int fenhao = s.find_first_of(';');
-		string var = s.substr(3, fenhao-3);
+		string var = s.substr(3, fenhao-strlen("int"));
 		var = trim(var);
 		//要查重
 		if(result.count(var))
@@ -147,9 +179,9 @@ void extract_val(string s, int flag)
 	if(flag == 2)
 	{
 		int fenhao = s.find_last_of(';');
-		string var = s.substr(5, fenhao - 3);
+		string var = s.substr(5, fenhao - strlen("float"));
 		var = trim(var);
-		if(result.count(var))
+		if(result2.count(var))
 		{
 			cout << "变量重复" << var << "定义！" << endl;
 		}
@@ -197,6 +229,9 @@ void lexical(string s)
 	else if(s.substr(0, 5) == "write")
 	{
 		//提取变量
+		/**
+		 * 输出这里还有一点问题，只在result中寻找了
+		 */
 		string var = s.substr(s.find("(") + 1, s.find_last_of(')') - s.find('(')-1);
 		if(result.count(var))
 		{
@@ -227,6 +262,8 @@ int main(char argc, char *argv[])
 	 	data = trim(data);
 	 	lexical(data);
 	 }
+
+	 system("pause");
 	 
 	// map<string, int> s;
 	// s["a"] = 1;
