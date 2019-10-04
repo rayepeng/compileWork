@@ -13,9 +13,9 @@ using namespace  std;
 map<string, int> result; //存整数的
 map<string, float>result2; //存浮点数的
 
-int factor_value();
-int term_value();
-int expression_value();
+float factor_value();
+float term_value();
+float expression_value();
 //实现trim函数
 string trim(string &s)
 {
@@ -49,7 +49,7 @@ void eval(string s)
 	}
 }
 
-int expression_value()
+float expression_value()
 {
 	//表达式是由tem+-term得到的
 	//计算出第一项的值
@@ -79,7 +79,7 @@ int expression_value()
 	return result;
 }
 
-int term_value()
+float term_value()
 {
 	//计算项的值
 	//term = factor*factor || factor / factor
@@ -108,7 +108,7 @@ int term_value()
 }
 
 
-int factor_value()
+float factor_value()
 {
 	// (expression_value) || 整数
 	float result = 0;
@@ -150,7 +150,6 @@ int factor_value()
 		}
 		if(countFloat)
 		{
-			cout << result;
 			result = result / pow(10, countFloat);
 		}
 	}
@@ -235,7 +234,10 @@ void lexical(string s)
 		string var = s.substr(s.find("(") + 1, s.find_last_of(')') - s.find('(')-1);
 		if(result.count(var))
 		{
-			cout << result[var];
+			cout << result[var] << endl;
+		}else if(result2.count(var))
+		{
+			cout << result2[var] << endl;
 		}
 	}
 
