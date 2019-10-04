@@ -10,9 +10,10 @@
 #include <math.h>
 using namespace  std;
 
-map<string, int> result; //存整数的
+map<string, int> resultofInt; //存整数的
 map<string, float>result2; //存浮点数的
 
+int flag_is_int = 1;
 float factor_value();
 float term_value();
 float expression_value();
@@ -37,10 +38,10 @@ void eval(string s)
 	var = trim(var);
 	map<string, int>::iterator iter;
 	int flag = 0;
-	if(result.count(var))
+	if(resultofInt.count(var))
 	{
 		flag = 1;
-		result[var] = expression_value();
+		resultofInt[var] = expression_value();
 	}
 	if(result2.count(var))
 	{
@@ -53,10 +54,12 @@ float expression_value()
 {
 	//表达式是由tem+-term得到的
 	//计算出第一项的值
+	line = trim(line);
 	float result = term_value();
 	bool more = true;
 	while (more)
 	{
+		line = trim(line);
 		char op = line[0];
 		if (op == '+' || op == '-')
 		{
@@ -87,8 +90,15 @@ float term_value()
 	bool more = true;
 	while (more)
 	{
+		//读取op之前一定要先去除首尾空格
+		line = trim(line);
 		char op = line[0];
-		if (op == '*' || op == '|')
+		while(op == ' ')
+		{
+			line = line.erase(0, 1);
+			op = line[0];
+		}
+		if (op == '*' || op == '/')
 		{
 			line = line.erase(0, 1);
 			if (op == '*')
@@ -111,17 +121,52 @@ float term_value()
 float factor_value()
 {
 	// (expression_value) || 整数
+	line = trim(line);
 	float result = 0;
 	char op = line[0];
 	if (op == '(')
 	{
-		result = expression_value();
+		line = trim(line);
 		line = line.erase(0, 1);
+		result = expression_value();
+		line = trim(line);
+		line = line.erase(0, 1);
+		
 	}
 	else
 	{
 		int countFloat = 0;
 		bool isFloat = false;
+
+		//这里有点小问题如果是变量参与运算
+		//考虑到变量参与运算，那么op就不是digit
+		if(!isdigit(op) && op != '*' && op != '/')
+		{
+			string lineTemp = line;
+			int count = 1;
+			//考虑变量名字很长
+			for(int i = 1; i < lineTemp.length(); i++)
+			{
+				if(lineTemp[i] == '*' || lineTemp[i] == '/')
+				{
+					break;
+				}
+				count++;
+			}
+			line.erase(0, count); //将变量这个字符清除掉
+			string var = lineTemp.substr(0, count);
+			var = trim(var);
+			if(resultofInt.count(var))
+			{
+				result = resultofInt[var];
+				return  result;
+			}
+			else if(result2.count(var))
+			{
+				result = result2[var];
+				return  result;
+			}
+		}
 		while (isdigit(op) || op == '.')
 		{
 			
@@ -155,27 +200,27 @@ float factor_value()
 	}
 	return result;
 }
-void extract_val(string s, int flag)
+void extract_val(string s)
 {
 	//int i = 1; flag代表是哪种类型的
-	if(flag == 1)
+	if(flag_is_int == 1)
 	{
 		//先找到分号的位置，然后提取出来注意substr函数有点不一样
 		int fenhao = s.find_first_of(';');
 		string var = s.substr(3, fenhao-strlen("int"));
 		var = trim(var);
 		//要查重
-		if(result.count(var))
+		if(resultofInt.count(var))
 		{
 			cout << "变量重复"<<var<<"定义！" << endl;
 		}
 		else
 		{
-			result.insert(pair<string, int>(var, 0));
+			resultofInt.insert(pair<string, int>(var, 0));
 		}
 		
 	}
-	if(flag == 2)
+	if(flag_is_int == 2)
 	{
 		int fenhao = s.find_last_of(';');
 		string var = s.substr(5, fenhao - strlen("float"));
@@ -203,7 +248,8 @@ void lexical(string s)
 		}
 		else
 		{
-			extract_val(s, 1);
+			flag_is_int = 1;
+			extract_val(s);
 		}
 	}
 	else if(s.substr(0, 5) == "float"){
@@ -213,7 +259,9 @@ void lexical(string s)
 		}
 		else
 		{
-			extract_val(s, 2);
+			//flag_is_int=2代表浮点数,然后开始解析表达式
+			flag_is_int = 2;
+			extract_val(s);
 		}
 	}
 	else if(s.substr(0, 6) == "double")
@@ -232,9 +280,9 @@ void lexical(string s)
 		 * 输出这里还有一点问题，只在result中寻找了
 		 */
 		string var = s.substr(s.find("(") + 1, s.find_last_of(')') - s.find('(')-1);
-		if(result.count(var))
+		if(resultofInt.count(var))
 		{
-			cout << result[var] << endl;
+			cout << resultofInt[var] << endl;
 		}else if(result2.count(var))
 		{
 			cout << result2[var] << endl;
