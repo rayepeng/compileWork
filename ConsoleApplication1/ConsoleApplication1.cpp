@@ -336,14 +336,22 @@ void lexical(string s)
 
 }
 
-int main(char argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	// FILE* f = fopen("test", "r");
 	// string data;
 	// fscanf(f, "%s", data);
 	string data;
 	ifstream infile;
+	// if(argc != 2)
+	// {
+	// 	cout << "没有指定输入的参数";
+	// }
+	/*printf("%s", argv[1]);
+	return 1;*/
+
 	// cout << "请输入文件名,如果不输入则默认是目录下的test文件 >> " ;
+	infile.open(argv[1]);
 	// string filename;
 	// cin >> filename;
 	// if(filename.length() != 0)
@@ -354,7 +362,7 @@ int main(char argc, char *argv[])
 	// 	cout << "没有指定输入默认打开test文件" << endl;
 	// 	infile.open("test");
 	// }
-	infile.open("test");
+	// infile.open("test");
 	if(!infile.is_open())
 	{
 		cout << "打开文件错误！！" << endl;
