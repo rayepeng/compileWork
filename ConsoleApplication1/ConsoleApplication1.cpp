@@ -8,16 +8,23 @@
 #include <fstream>
 #include <map>
 #include <math.h>
+#include <vector>
 using namespace  std;
 
 map<string, int> resultofInt; //存整数的
 map<string, float>result2; //存浮点数的
-
+vector<string> UndefineVar; //存储未定义的变量
+string line; //每次读取文件中的一行
 int flag_is_int = 1;
-float factor_value();
-float term_value();
-float expression_value();
+float factor_value(string var);
+float term_value(string var);
+float expression_value(string var);
 //实现trim函数
+/**
+ *由于输入的数据中不可避免地存在很多空白的字符所以一定要将空白符去除掉
+ * @parma string &s 输入的字符串
+ * @return string 返回被去除了首尾空格的字符串
+ */
 string trim(string &s)
 {
 	if(s.empty())
@@ -29,7 +36,10 @@ string trim(string &s)
 	return s;
 }
 
-string line;
+/**
+ * @param string s传入的表达式
+ * @return void 
+ */
 void eval(string s)
 {
 	line = s.substr(s.find('=')+1).substr(0, s.find_last_of(';'));
@@ -41,21 +51,25 @@ void eval(string s)
 	if(resultofInt.count(var))
 	{
 		flag = 1;
-		resultofInt[var] = expression_value();
+		resultofInt[var] = expression_value(var);
 	}
 	if(result2.count(var))
 	{
 		flag = 2;
-		result2[var] = expression_value();
+		result2[var] = expression_value(var);
 	}
 }
 
-float expression_value()
+/**
+ * @param string var 输入的表达式
+ * @return float 表达式的值
+ */
+float expression_value(string var)
 {
 	//表达式是由tem+-term得到的
 	//计算出第一项的值
 	line = trim(line);
-	float result = term_value();
+	float result = term_value(var);
 	bool more = true;
 	while (more)
 	{
@@ -66,11 +80,11 @@ float expression_value()
 			line = line.erase(0,1);
 			if (op == '+')
 			{
-				result += term_value();
+				result += term_value(var);
 			}
 			else
 			{
-				result -= term_value();
+				result -= term_value(var);
 			}
 		}
 		else
@@ -82,11 +96,15 @@ float expression_value()
 	return result;
 }
 
-float term_value()
+/**
+ * @param string var 表达式中的项
+ * @return float 项的值
+ */
+float term_value(string var)
 {
 	//计算项的值
 	//term = factor*factor || factor / factor
-	float result = factor_value();
+	float result = factor_value(var);
 	bool more = true;
 	while (more)
 	{
@@ -102,10 +120,10 @@ float term_value()
 		{
 			line = line.erase(0, 1);
 			if (op == '*')
-				result *= factor_value();
+				result *= factor_value(var);
 			else
 			{
-				result /= factor_value();
+				result /= factor_value(var);
 			}
 
 		}
@@ -117,8 +135,11 @@ float term_value()
 	return result;
 }
 
-
-float factor_value()
+/**
+ * @param string var 项中的因子
+ * @return float 项的值
+ */
+float factor_value(string var)
 {
 	// (expression_value) || 整数
 	line = trim(line);
@@ -128,7 +149,7 @@ float factor_value()
 	{
 		line = trim(line);
 		line = line.erase(0, 1);
-		result = expression_value();
+		result = expression_value(var);
 		line = trim(line);
 		line = line.erase(0, 1);
 		
@@ -154,18 +175,24 @@ float factor_value()
 				count++;
 			}
 			line.erase(0, count); //将变量这个字符清除掉
-			string var = lineTemp.substr(0, count);
-			var = trim(var);
-			if(resultofInt.count(var))
+			string varFind = lineTemp.substr(0, count);
+			varFind = trim(varFind);
+			if(resultofInt.count(varFind))
 			{
-				result = resultofInt[var];
+				result = resultofInt[varFind];
 				return  result;
 			}
-			else if(result2.count(var))
+			else if(result2.count(varFind))
 			{
-				result = result2[var];
+				result = result2[varFind];
 				return  result;
-			}
+			}else
+			{
+				cout << "变量" << varFind << "未定义" << endl;
+				//如果被赋值的变量中存在未定义的变量那么这个变量也是未定义的
+				UndefineVar.push_back(varFind);
+				UndefineVar.push_back(var);
+			} 
 		}
 		while (isdigit(op) || op == '.')
 		{
@@ -200,6 +227,12 @@ float factor_value()
 	}
 	return result;
 }
+
+/**
+ *解析文本中的一行
+ * @param string s文件中一行
+ * @return void
+ */
 void extract_val(string s)
 {
 	//int i = 1; flag代表是哪种类型的
@@ -237,6 +270,11 @@ void extract_val(string s)
 	}
 
 }
+
+/**
+ * @param string s
+ * @return void
+ */
 void lexical(string s)
 {
 	if(s.substr(0,3) == "int")
@@ -244,7 +282,7 @@ void lexical(string s)
 		if(s.find('=') != -1)
 		{
 			//说明在赋值
-			cout << "暂时不支持";
+			cout << "暂时不支持声明变量的时候赋值";
 		}
 		else
 		{
@@ -255,7 +293,7 @@ void lexical(string s)
 	else if(s.substr(0, 5) == "float"){
 		if(s.find('=') != -1)
 		{
-			cout << "暂时不支持";
+			cout << "暂时不支持不支持声明变量的时候赋值";
 		}
 		else
 		{
@@ -266,7 +304,7 @@ void lexical(string s)
 	}
 	else if(s.substr(0, 6) == "double")
 	{
-		
+		cout << "不支持double类型的数据" << endl;
 	}
 
 	else if(s.find('=')!=-1)
@@ -280,6 +318,13 @@ void lexical(string s)
 		 * 输出这里还有一点问题，只在result中寻找了
 		 */
 		string var = s.substr(s.find("(") + 1, s.find_last_of(')') - s.find('(')-1);
+		vector<string>::iterator it;
+		it = find(UndefineVar.begin(), UndefineVar.end(), var);
+		if(it != UndefineVar.end())
+		{
+			//说明变量是未定义的
+			return;
+		}
 		if(resultofInt.count(var))
 		{
 			cout << resultofInt[var] << endl;
@@ -298,6 +343,17 @@ int main(char argc, char *argv[])
 	// fscanf(f, "%s", data);
 	string data;
 	ifstream infile;
+	// cout << "请输入文件名,如果不输入则默认是目录下的test文件 >> " ;
+	// string filename;
+	// cin >> filename;
+	// if(filename.length() != 0)
+	// {
+	// 	infile.open(filename);
+	// }else
+	// {
+	// 	cout << "没有指定输入默认打开test文件" << endl;
+	// 	infile.open("test");
+	// }
 	infile.open("test");
 	if(!infile.is_open())
 	{
@@ -314,13 +370,4 @@ int main(char argc, char *argv[])
 	 }
 
 	 system("pause");
-	 
-	// map<string, int> s;
-	// s["a"] = 1;
-	// map<string, int>::iterator iter;
-	// iter = s.find("b");
-	// if(s.count("b"))
-	// {
-	// 	cout << "hhh";
-	// }
 }
