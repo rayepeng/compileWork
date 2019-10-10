@@ -168,7 +168,7 @@ float factor_value(string var)
 			//考虑变量名字很长
 			for(int i = 1; i < lineTemp.length(); i++)
 			{
-				if(lineTemp[i] == '*' || lineTemp[i] == '/')
+				if(lineTemp[i] == '*' || lineTemp[i] == '/' || lineTemp[i] == '+' || lineTemp[i] == '-')
 				{
 					break;
 				}
